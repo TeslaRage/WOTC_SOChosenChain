@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Default" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Guid>846a8c1a-2e4c-49a8-aaa1-6f7a7e9207ac</Guid>
+    <Name>WOTC_SOChosenChain</Name>
+    <Description>Description of My XCOM 2 Mod.</Description>
+    <SteamPublishID>0</SteamPublishID>
+    <AssemblyName>WOTC_SOChosenChain</AssemblyName>
+    <RootNamespace>WOTC_SOChosenChain</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="Config\" />
+    <Folder Include="Localization\" />
+    <Folder Include="Src\" />
+    <Folder Include="Src\WOTC_SOChosenChain\" />
+    <Folder Include="Src\WOTC_SOChosenChain\Classes\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Config\XComChosenChain.ini">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Config\XComGameBoard.ini">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Config\XComInfiltration.ini">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Config\XComMissionSources.ini">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Localization\CovertInfiltration.int">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="ReadMe.txt" />
+    <Content Include="ModPreview.jpg" />
+    <Content Include="Config\XComEditor.ini" />
+    <Content Include="Config\XComEngine.ini" />
+    <Content Include="Config\XComGame.ini" />
+    <Content Include="Localization\XComGame.int" />
+    <Content Include="Src\WOTC_SOChosenChain\Classes\X2DLCInfo_SOChosenChain.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\WOTC_SOChosenChain\Classes\X2EventListener_ChosenChain.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\WOTC_SOChosenChain\Classes\X2StrategyElement_HuntChosenActivities.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\WOTC_SOChosenChain\Classes\X2StrategyElement_HuntChosenActivityChains.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\WOTC_SOChosenChain\Classes\XComGameState_Activity_WaitPlot.uc">
+      <SubType>Content</SubType>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildLocalExtensionPath)\XCOM2.targets" />
+</Project>

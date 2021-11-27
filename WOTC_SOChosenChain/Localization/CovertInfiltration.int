@@ -1,0 +1,55 @@
+[ActivityChain_HuntChosen X2ActivityChainTemplate]
+strTitle="Hunt the Chosen"
+strDescription="Hunt the <font color='#E52E11'>Chosen <XGParam:StrValue0/!ChosenClass/></font>, locate and assault the stronghold to rid of them once and for all."
+strObjective="track, locate and identify the access point to Chosen Stronghold"
+
+[ActivityChain_HuntChosen_Uno X2ActivityChainTemplate]
+strTitle="Hunt the Chosen"
+strDescription="Hunt the <font color='#E52E11'>Chosen <XGParam:StrValue0/!ChosenClass/></font>, locate and assault the stronghold to rid of them once and for all."
+strObjective="track, locate and identify the access point to Chosen Stronghold"
+
+[ActivityChain_HuntChosen_Dos X2ActivityChainTemplate]
+strTitle="Hunt the Chosen"
+strDescription="Hunt the <font color='#E52E11'>Chosen <XGParam:StrValue0/!ChosenClass/></font>, locate and assault the stronghold to rid of them once and for all."
+strObjective="track, locate and identify the access point to Chosen Stronghold"
+
+[ActivityChain_HuntChosen_Tres X2ActivityChainTemplate]
+strTitle="Hunt the Chosen"
+strDescription="Hunt the <font color='#E52E11'>Chosen <XGParam:StrValue0/!ChosenClass/></font>, locate and assault the stronghold to rid of them once and for all."
+strObjective="track, locate and identify the access point to Chosen Stronghold"
+
+[Activity_RevealChosenMovements X2ActivityTemplate_CovertAction]
+strOverviewDescription="Track Chosen Movements"
+
+[Activity_RevealChosenStrengths X2ActivityTemplate_CovertAction]
+strOverviewDescription="Locate Chosen Stronghold"
+
+[Activity_RevealChosenStronghold X2ActivityTemplate_CovertAction]
+strOverviewDescription="Identify Stronghold's Access Point"
+
+[Activity_HCSupplyConvoy X2ActivityTemplate_Assault]
+strOverviewDescription="Raid Chosen's Supply Convoy"
+MissionPinLabel="Chosen Supply Convoy"
+
+[Activity_HCIntelligenceInfiltrate X2ActivityTemplate_Infiltration]
+strOverviewDescription="Hack Chosen Datavault"
+
+[Activity_WaitForPlot1 X2ActivityTemplate]
+strOverviewHeader="ON HOLD"
+strOverviewDescription="Complete <font color='#E52E11'><XGParam:StrValue0/!Obj1/></font> to progress further"
+
+[Activity_WaitForPlot2 X2ActivityTemplate]
+strOverviewHeader="ON HOLD"
+strOverviewDescription="Complete <font color='#E52E11'><XGParam:StrValue0/!Obj1/></font> to progress further"
+
+[Activity_HCSecureUFO X2ActivityTemplate_Assault]
+strOverviewDescription="Secure Chosen Commanded UFO"
+MissionPinLabel="Chosen's UFO"
+
+[Activity_HCRescueScientist X2ActivityTemplate_Assault]
+strOverviewDescription="Rescue Scientist"
+MissionPinLabel="Rescue Scientist"
+
+[Activity_HCRescueEngineer X2ActivityTemplate_Assault]
+strOverviewDescription="Rescue Engineer"
+MissionPinLabel="Rescue Engineer"
