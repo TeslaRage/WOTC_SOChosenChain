@@ -151,6 +151,25 @@ static function bool IsChosenGuaranteedActivities(name ActivityName)
     return true;
 }
 
+static function XComGameState_AdventChosen GetChosenState(name ChosenName, out StateObjectReference FactionRef)
+{
+	local XComGameState_AdventChosen Chosen;
+	local XComGameState_ResistanceFaction ResFaction;
+
+	foreach `XCOMHISTORY.IterateByClassType(class'XComGameState_AdventChosen', Chosen)
+	{
+		ResFaction = XComGameState_ResistanceFaction(`XCOMHISTORY.GetGameStateForObjectID(Chosen.RivalFaction.ObjectID));
+		FactionRef = ResFaction.GetReference();
+
+		if (Chosen.GetMyTemplateName() == ChosenName && Chosen.bMetXCom && !Chosen.bDefeated && ResFaction.bMetXCom)
+		{
+			return Chosen;
+		}
+	}
+
+	return none;
+}
+
 // ChainState.GetCurrentActivity() will not work if this function is used. No safe way to do this, so disabling for now.
 // exec function ProgressChosenChain (string ChosenClass)
 // {
@@ -179,7 +198,7 @@ static function bool IsChosenGuaranteedActivities(name ActivityName)
 // }
 
 // The content is copied from XComGameState_ActivityChain::DoRemove
-exec function RemoveChosenChain ()
+exec function ChosenChain_RemoveAllChains ()
 {
     local XComGameState_ActivityChain ChainState, NewChainState;
     local XComGameState NewGameState;
@@ -191,7 +210,7 @@ exec function RemoveChosenChain ()
     {        
         if (IsChosenChain(ChainState.GetMyTemplateName()) && !ChainState.bEnded)
         {
-            `LOG("RemoveChosenChain: Attempt removal of chain " $ChainState.GetMyTemplateName(), class'X2EventListener_ChosenChain'.default.bLog, 'SOChosenChain');
+            `LOG("RemoveAllChosenChain: Attempt removal of chain " $ChainState.GetMyTemplateName(), class'X2EventListener_ChosenChain'.default.bLog, 'SOChosenChain');
 
             NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("SOChosenChain: Removing" @ ChainState.GetMyTemplateName());
             NewChainState = XComGameState_ActivityChain(NewGameState.ModifyStateObject(class'XComGameState_ActivityChain', ChainState.ObjectID));
@@ -213,15 +232,104 @@ exec function RemoveChosenChain ()
             if (ChainState.GetMyTemplate().RemoveChainLate != none) ChainState.GetMyTemplate().RemoveChainLate(NewGameState, NewChainState);
 
             NewGameState.RemoveStateObject(ChainState.ObjectID);
-            `SubmitGameState(NewGameState);
+            `XCOMGAME.GameRuleset.SubmitGameState(NewGameState);
 
-            `LOG("RemoveChosenChain: Completed removal of chain " $ChainState.GetMyTemplateName(), class'X2EventListener_ChosenChain'.default.bLog, 'SOChosenChain');
+            `LOG("RemoveAllChosenChain: Completed removal of chain " $ChainState.GetMyTemplateName(), class'X2EventListener_ChosenChain'.default.bLog, 'SOChosenChain');
         }
     }
 }
 
+// The content is copied from XComGameState_ActivityChain::DoRemove
+exec function ChosenChain_RemoveChain (name ChosenName)
+{
+	local XComGameState_ActivityChain ChainState, NewChainState;
+	local XComGameState NewGameState;
+	local StateObjectReference ActivityRef, ComplicationRef;
+	local XComGameState_Activity ActivityState;
+	local XComGameState_Complication ComplicationState;
+	local XComGameState_AdventChosen RivalChosen;
+	local XComGameStateHistory History;
+
+	History = `XCOMHISTORY;
+
+	foreach History.IterateByClassType(class'XComGameState_ActivityChain', ChainState)
+	{		
+		if (IsChosenChain(ChainState.GetMyTemplateName()) && !ChainState.bEnded)
+		{
+			`LOG("RemoveChosenChain: Attempt removal of chain " $ChainState.GetMyTemplateName(), class'X2EventListener_ChosenChain'.default.bLog, 'SOChosenChain');
+
+			// Get rival chosen
+			RivalChosen =  XComGameState_AdventChosen(History.GetGameStateForObjectID(
+							XComGameState_ResistanceFaction(History.GetGameStateForObjectID(ChainState.FactionRef.ObjectID)).RivalChosen.ObjectID));
+
+			// Only proceed if this is the chosen chain we want
+			if (RivalChosen.GetMyTemplateName() != ChosenName) continue;
+
+			NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("SOChosenChain: Removing" @ ChainState.GetMyTemplateName());
+			NewChainState = XComGameState_ActivityChain(NewGameState.ModifyStateObject(class'XComGameState_ActivityChain', ChainState.ObjectID));
+
+			if (ChainState.GetMyTemplate().RemoveChain != none) ChainState.GetMyTemplate().RemoveChain(NewGameState, NewChainState);
+
+			foreach ChainState.StageRefs(ActivityRef)
+			{
+				ActivityState = XComGameState_Activity(NewGameState.ModifyStateObject(class'XComGameState_Activity', ActivityRef.ObjectID));
+				ActivityState.RemoveEntity(NewGameState);
+			}
+
+			foreach ChainState.ComplicationRefs(ComplicationRef)
+			{
+				ComplicationState = XComGameState_Complication(NewGameState.ModifyStateObject(class'XComGameState_Complication', ComplicationRef.ObjectID));
+				ComplicationState.RemoveComplication(NewGameState);
+			}
+
+			if (ChainState.GetMyTemplate().RemoveChainLate != none) ChainState.GetMyTemplate().RemoveChainLate(NewGameState, NewChainState);
+
+			NewGameState.RemoveStateObject(ChainState.ObjectID);
+			`XCOMGAME.GameRuleset.SubmitGameState(NewGameState);
+
+			`LOG("RemoveChosenChain: Completed removal of chain " $ChainState.GetMyTemplateName(), class'X2EventListener_ChosenChain'.default.bLog, 'SOChosenChain');
+		}
+	}
+}
+
+exec function ChosenChain_SpawnActivityChain (name ChosenName, int StartAtStage = 0)
+{
+	local X2StrategyElementTemplateManager TemplateManager;
+	local XComGameState_ActivityChain ChainState;
+	local X2ActivityChainTemplate ChainTemplate;
+	local XComGameState NewGameState;
+	local XComGameState_AdventChosen Chosen;
+	local array<StateObjectReference> RegionRefs;
+	local StateObjectReference FactionRef, SelectedRegion;
+
+	Chosen = GetChosenState(ChosenName, FactionRef);
+	if (Chosen == none) return;
+	if (class'X2EventListener_ChosenChain'.static.ExistingChainAvailable(FactionRef)) return;
+
+	NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("CHEAT: SpawnChosenActivityChain for" @ ChosenName);
+	TemplateManager = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
+	ChainTemplate = X2ActivityChainTemplate(TemplateManager.FindStrategyElementTemplate(class'X2EventListener_ChosenChain'.static.GetChainByChosenTemplateName(Chosen.GetMyTemplateName())));
+
+	ChainState = ChainTemplate.CreateInstanceFromTemplate(NewGameState);
+	ChainState.HACK_SetCurrentStage(StartAtStage - 1);
+	ChainState.HACK_SetStartedAt(class'XComGameState_GeoscapeEntity'.static.GetCurrentTime());
+
+	// Chosen Chain specific parameters that need to be filled out
+	ChainState.FactionRef = FactionRef;
+
+	RegionRefs = Chosen.TerritoryRegions;
+	SelectedRegion = RegionRefs[`SYNC_RAND_STATIC(RegionRefs.Length)];
+	ChainState.PrimaryRegionRef = SelectedRegion;
+	ChainState.SecondaryRegionRef = SelectedRegion;	
+
+	// Start chain
+	ChainState.StartNextStage(NewGameState);
+
+	`XCOMGAME.GameRuleset.SubmitGameState(NewGameState);
+}
+
 // To be used in cases where the activity wait does not move even when plot objectives have been completed
-exec function RemoveWaitChosenChain ()
+exec function ChosenChain_RemoveWaitStep ()
 {
     local XComGameState_ActivityChain ChainState;
     local XComGameState NewGameState;
@@ -242,7 +350,7 @@ exec function RemoveWaitChosenChain ()
     }
 }
 
-exec function PrintChosenCAsGoldenPathStatus()
+exec function ChosenChain_PrintActivityGoldenPathStatus()
 {
     local X2StrategyElementTemplateManager StratTemplateManager;        
     local X2CovertActionTemplate CovertActionTemplate;    
