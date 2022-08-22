@@ -31,7 +31,8 @@ static function CreateActivity_RevealChosenMovements (out array<X2DataTemplate> 
 	
 	`CREATE_X2TEMPLATE(class'X2ActivityTemplate_CovertAction', Activity, 'Activity_RevealChosenMovements');
     
-	Activity.AvailableSound = "Geoscape_NewResistOpsMissions";	
+	Activity.AvailableSound = "Geoscape_NewResistOpsMissions";
+	Activity.RemoveStage = RemoveAssociatedStateObjects;
 	
 	Templates.AddItem(Activity);
 }
@@ -43,6 +44,7 @@ static function CreateActivity_RevealChosenStrengths (out array<X2DataTemplate> 
 	`CREATE_X2TEMPLATE(class'X2ActivityTemplate_CovertAction', Activity, 'Activity_RevealChosenStrengths');
 	    
 	Activity.AvailableSound = "Geoscape_NewResistOpsMissions";
+	Activity.RemoveStage = RemoveAssociatedStateObjects;
 	
 	Templates.AddItem(Activity);
 }
@@ -54,6 +56,7 @@ static function CreateActivity_RevealChosenStronghold (out array<X2DataTemplate>
 	`CREATE_X2TEMPLATE(class'X2ActivityTemplate_CovertAction', Activity, 'Activity_RevealChosenStronghold');
 	    
 	Activity.AvailableSound = "Geoscape_NewResistOpsMissions";
+	Activity.RemoveStage = RemoveAssociatedStateObjects;
 	
 	Templates.AddItem(Activity);
 }
@@ -77,6 +80,8 @@ static function CreateActivity_SupplyConvoy(out array<X2DataTemplate> Templates)
 	Activity.GetMissionDifficulty = GetMissionDifficultyFromMonthPlusTemplate;
 	Activity.WasMissionSuccessful = class'X2StrategyElement_DefaultMissionSources'.static.OneStrategyObjectiveCompleted;
 	Activity.AvailableSound = "Geoscape_Supply_Raid_Popup";
+
+	Activity.RemoveStage = RemoveAssociatedStateObjects;
 	
 	Templates.AddItem(Activity);
 }
@@ -93,6 +98,8 @@ static function CreateActivity_IntelligenceInfiltration (out array<X2DataTemplat
 	ActivityInfil.GetMissionDifficulty = GetMissionDifficultyFromMonth;
 	ActivityInfil.WasMissionSuccessful = class'X2StrategyElement_DefaultMissionSources'.static.OneStrategyObjectiveCompleted;
 	ActivityInfil.AvailableSound = "Geoscape_NewResistOpsMissions";
+
+	ActivityInfil.RemoveStage = RemoveAssociatedStateObjects;
 	
 	Templates.AddItem(CovertAction);
 	Templates.AddItem(ActivityInfil);
@@ -258,6 +265,8 @@ static function CreateActivity_SecureUFO(out array<X2DataTemplate> Templates)
 	Activity.WasMissionSuccessful = class'X2StrategyElement_DefaultMissionSources'.static.OneStrategyObjectiveCompleted;
 	Activity.AvailableSound = "Geoscape_UFO_Landed";
 
+	Activity.RemoveStage = RemoveAssociatedStateObjects;
+
 	Templates.AddItem(Activity);
 }
 
@@ -277,6 +286,8 @@ static function CreateActivity_RescueScientist(out array<X2DataTemplate> Templat
 	Activity.GetMissionDifficulty = GetMissionDifficultyFromMonthPlusTemplate;
 	Activity.WasMissionSuccessful = class'X2StrategyElement_DefaultMissionSources'.static.OneStrategyObjectiveCompleted;
 	Activity.AvailableSound = "Geoscape_NewResistOpsMissions";
+
+	Activity.RemoveStage = RemoveAssociatedStateObjects;
 
 	Templates.AddItem(Activity);
 }
@@ -298,5 +309,44 @@ static function CreateActivity_RescueEngineer(out array<X2DataTemplate> Template
 	Activity.WasMissionSuccessful = class'X2StrategyElement_DefaultMissionSources'.static.OneStrategyObjectiveCompleted;
 	Activity.AvailableSound = "Geoscape_NewResistOpsMissions";
 
+	Activity.RemoveStage = RemoveAssociatedStateObjects;
+
 	Templates.AddItem(Activity);
+}
+
+static function RemoveAssociatedStateObjects (XComGameState NewGameState, XComGameState_Activity ActivityState)
+{
+	local XComGameStateHistory History;
+	local XComGameState_MissionSite MissionSite;
+	local XComGameState_CovertAction CovertAction;
+	local XComGameState_MissionSiteInfiltration MissionSiteInfil;
+
+	History = `XCOMHISTORY;
+
+	// X2ActivityTemplate_Infiltration
+	MissionSiteInfil = XComGameState_MissionSiteInfiltration(History.GetGameStateForObjectID(ActivityState.PrimaryObjectRef.ObjectID));
+	if (MissionSiteInfil != none)
+	{
+		MissionSiteInfil.RemoveEntity(NewGameState);
+	}
+
+	CovertAction = XComGameState_CovertAction(History.GetGameStateForObjectID(ActivityState.SecondaryObjectRef.ObjectID));
+	if (CovertAction != none)
+	{
+		CovertAction.RemoveEntity(NewGameState);
+	}
+
+	// X2ActivityTemplate_Assault
+	MissionSite = XComGameState_MissionSite(History.GetGameStateForObjectID(ActivityState.PrimaryObjectRef.ObjectID));
+	if (MissionSite != none)
+	{
+		MissionSite.RemoveEntity(NewGameState);
+	}
+
+	// X2ActivityTemplate_CovertAction
+	CovertAction = XComGameState_CovertAction(History.GetGameStateForObjectID(ActivityState.PrimaryObjectRef.ObjectID));
+	if (CovertAction != none)
+	{
+		CovertAction.RemoveEntity(NewGameState);
+	}
 }
