@@ -1,10 +1,7 @@
 class X2DLCInfo_SOChosenChain extends X2DownloadableContentInfo;
 
 var array<name> ChosenChainNames;
-// var array<name> UsableChosenChains;
 var array<name> ChosenGuaranteedActivities;
-
-// var config array<name> ChainPool;
 
 struct ActivitiesPlots
 {
@@ -33,8 +30,6 @@ static function UpdateDefaultChosenCovertActions()
     StratTemplateManager = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();    
     ActivityCovertActionTemplate = X2ActivityTemplate_CovertAction(StratTemplateManager.FindStrategyElementTemplate('Activity_RevealChosenMovements'));
     CovertActionTemplate = X2CovertActionTemplate(StratTemplateManager.FindStrategyElementTemplate('CovertAction_RevealChosenMovements'));
-
-    // Template.OverworldMeshPath = "UI_3D.Overwold_Final.Retribution";
 
     if (ActivityCovertActionTemplate != none && CovertActionTemplate != none)
     {
@@ -169,33 +164,6 @@ static function XComGameState_AdventChosen GetChosenState(name ChosenName, out S
 
 	return none;
 }
-
-// ChainState.GetCurrentActivity() will not work if this function is used. No safe way to do this, so disabling for now.
-// exec function ProgressChosenChain (string ChosenClass)
-// {
-//     local XComGameState_ActivityChain ChainState;
-//     local XComGameState_ResistanceFaction FactionState;
-//     local XComGameState_AdventChosen RivalChosen;
-//     local XComGameState NewGameState;
-
-//     foreach `XCOMHISTORY.IterateByClassType(class'XComGameState_ActivityChain', ChainState)
-//     {
-//         if (ChainState.GetMyTemplateName() == 'ActivityChain_HuntChosen' && !ChainState.bEnded)
-//         {
-//             FactionState = XComGameState_ResistanceFaction(`XCOMHISTORY.GetGameStateForObjectID(ChainState.FactionRef.ObjectID));
-//             RivalChosen = FactionState.GetRivalChosen();
-            
-//             if (RivalChosen.GetChosenClassName() == ChosenClass)
-//             {
-//                 NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("SOChosenChain CHEAT: Progress Chosen Chain");
-//                 // NewGameState = class'XComGameState'.ModifyStateObject(class'XComGameState_ActivityChain', ChainState.GetReference().ObjectID);
-//                 // ChainState.CurrentStageHasCompleted(NewGameState);
-//                 ChainState.StartNextStage(NewGameState);
-//                 `XCOMGAME.GameRuleset.SubmitGameState(NewGameState);
-//             }
-//         }
-//     }
-// }
 
 // The content is copied from XComGameState_ActivityChain::DoRemove
 exec function ChosenChain_RemoveAllChains ()
@@ -385,11 +353,6 @@ DefaultProperties
     ChosenChainNames[1] = "ActivityChain_HuntChosen_Uno";
     ChosenChainNames[2] = "ActivityChain_HuntChosen_Dos";
     ChosenChainNames[3] = "ActivityChain_HuntChosen_Tres";
-
-    // Used during selection of which chain to spawn
-    // UsableChosenChains[0] = "ActivityChain_HuntChosen_Uno";
-    // UsableChosenChains[1] = "ActivityChain_HuntChosen_Dos";
-    // UsableChosenChains[2] = "ActivityChain_HuntChosen_Tres";
 
     // Controls activities that have guaranteed chosen appearance
     ChosenGuaranteedActivities[0] = "Activity_HCSupplyConvoy";

@@ -16,7 +16,6 @@ static function array<X2DataTemplate> CreateTemplates()
 	CreateActivity_SecureUFO(Templates);
 	CreateActivity_RescueScientist(Templates);
 	CreateActivity_RescueEngineer(Templates);
-	// CreateActivity_StrongholdInfiltration(Templates);
 
 	return Templates;
 }
@@ -104,51 +103,6 @@ static function CreateActivity_IntelligenceInfiltration (out array<X2DataTemplat
 	Templates.AddItem(CovertAction);
 	Templates.AddItem(ActivityInfil);
 }
-
-// Experimental ===============================================================
-// static function CreateActivity_StrongholdInfiltration (out array<X2DataTemplate> Templates)
-// {
-// 	local X2ActivityTemplate_Infiltration ActivityInfil;
-// 	local X2CovertActionTemplate CovertAction;
-
-// 	CovertAction = class'X2StrategyElement_InfiltrationActions'.static.CreateInfiltrationTemplate('CovertAction_StrongholdInfiltration', true);
-// 	ActivityInfil = CreateStandardInfilActivity(CovertAction, "StrongholdInfiltration", "GeoscapeMesh_CI.CI_Geoscape.CI_HackDevice", "img:///UILibrary_StrategyImages.X2StrategyMap.MissionIcon_ResHQ");
-	
-// 	// ActivityInfil.MissionRewards.AddItem('Reward_None');
-// 	ActivityInfil.GetMissionDifficulty = GetMissionDifficultyFromMonth;
-// 	ActivityInfil.WasMissionSuccessful = class'X2StrategyElement_DefaultMissionSources'.static.OneStrategyObjectiveCompleted;
-// 	ActivityInfil.AvailableSound = "Geoscape_NewResistOpsMissions";
-// 	ActivityInfil.SetupStage = StrongholdInfiltrationSetup;
-	
-// 	Templates.AddItem(CovertAction);
-// 	Templates.AddItem(ActivityInfil);
-// }
-
-// // Experimental ===============================================================
-// static function StrongholdInfiltrationSetup (XComGameState NewGameState, XComGameState_Activity ActivityState)
-// {
-// 	class'X2ActivityTemplate_Infiltration'.static.CreateCovertAction(NewGameState, ActivityState);
-// 	AssignStrongholdMission(NewGameState, ActivityState);
-
-// 	class'X2ActivityTemplate_Infiltration'.static.AddExpiration(NewGameState, ActivityState);
-// 	class'X2ActivityTemplate_Infiltration'.static.SetupFlatRisk(NewGameState, ActivityState);
-// }
-
-// // Experimental ===============================================================
-// static function AssignStrongholdMission (XComGameState NewGameState, XComGameState_Activity ActivityState)
-// {
-// 	local XComGameState_MissionSiteInfiltration MissionState;
-// 	// local XComGameState_ActivityChain ChainState;
-// 	// local XComGameState_ResistanceFaction FactionState;
-
-// 	MissionState = XComGameState_MissionSiteInfiltration(NewGameState.CreateNewStateObject(class'XComGameState_MissionSiteInfiltration'));
-// 	ActivityState.PrimaryObjectRef = MissionState.GetReference();
-// 	// ChainState = `XCOMHISTORY.GetGameStateForObjectID(ActivityState.ChainRef.ObjectID);
-// 	// FactionState = `XCOMHISTORY.GetGameStateForObjectID(ChainState.FactionRef);
-// 	// ActivityState.PrimaryObjectRef = FactionState.GetRivalChosen().StrongholdMission;
-	
-// 	MissionState.InitializeFromActivity(NewGameState);
-// }
 
 static function CreateActivity_WaitForPlot1(out array<X2DataTemplate> Templates)
 {
@@ -313,6 +267,10 @@ static function CreateActivity_RescueEngineer(out array<X2DataTemplate> Template
 
 	Templates.AddItem(Activity);
 }
+
+/////////////////
+/// Delegates ///
+/////////////////
 
 static function RemoveAssociatedStateObjects (XComGameState NewGameState, XComGameState_Activity ActivityState)
 {
