@@ -13,9 +13,9 @@ event OnCreation (optional X2DataTemplate Template)
 	super.OnCreation(Template);
 
 	EventManager = `XEVENTMGR;
-	SelfObj = self;	
+	SelfObj = self;
 
-    EventManager.RegisterForEvent(SelfObj, 'ObjectiveCompleted', OnObjectiveCompleted, ELD_OnStateSubmitted, , , true, SelfObj);
+	EventManager.RegisterForEvent(SelfObj, 'ObjectiveCompleted', OnObjectiveCompleted, ELD_OnStateSubmitted, , , true, SelfObj);
 }
 
 ///////////////////////
@@ -26,9 +26,9 @@ function EventListenerReturn OnObjectiveCompleted(Object EventData, Object Event
 {
 	local XComGameState_Activity ActivityState;
 	local XComGameState_Objective ObjectiveState;
-    local array<name> ObjectivesForActivity;
-    local XComGameState NewGameState;
-    local XComGameState_Activity_Wait WaitActivityState;
+	local array<name> ObjectivesForActivity;
+	local XComGameState NewGameState;
+	local XComGameState_Activity_Wait WaitActivityState;
 
 	`LOG("Entering XComGameState_Activity_WaitPlot::OnObjectiveCompleted", class'X2EventListener_ChosenChain'.default.bLog, 'SOChosenChain');
 
@@ -47,21 +47,21 @@ function EventListenerReturn OnObjectiveCompleted(Object EventData, Object Event
 
 	if (ObjectiveState == none && ActivityState == none) return ELR_NoInterrupt;
 
-    if (ActivityState.CompletionStatus == eActivityCompletion_NotCompleted)
-    {        
-        ObjectivesForActivity = class'X2DLCInfo_SOChosenChain'.static.GetObjectivesForActivity(ActivityState);
+	if (ActivityState.CompletionStatus == eActivityCompletion_NotCompleted)
+	{
+		ObjectivesForActivity = class'X2DLCInfo_SOChosenChain'.static.GetObjectivesForActivity(ActivityState);
 
-        if (ObjectivesForActivity.Length == 0) return ELR_NoInterrupt;
+		if (ObjectivesForActivity.Length == 0) return ELR_NoInterrupt;
 
-        if (ObjectivesForActivity.Find(ObjectiveState.GetMyTemplateName()) == INDEX_NONE) return ELR_NoInterrupt;
+		if (ObjectivesForActivity.Find(ObjectiveState.GetMyTemplateName()) == INDEX_NONE) return ELR_NoInterrupt;
 
-        `LOG("Completing Wait Stage", class'X2EventListener_ChosenChain'.default.bLog, 'SOChosenChain');
-        NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("SOChosenChain: Progressing Wait Plots");
+		`LOG("Completing Wait Stage", class'X2EventListener_ChosenChain'.default.bLog, 'SOChosenChain');
+		NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("SOChosenChain: Progressing Wait Plots");
 
-        WaitActivityState = XComGameState_Activity_WaitPlot(NewGameState.ModifyStateObject(class'XComGameState_Activity_Wait', ActivityState.ObjectID));
-        WaitActivityState.ProgressAt = `STRATEGYRULES.GameTime;
-        `XCOMGAME.GameRuleset.SubmitGameState(NewGameState);
-    }
+		WaitActivityState = XComGameState_Activity_WaitPlot(NewGameState.ModifyStateObject(class'XComGameState_Activity_Wait', ActivityState.ObjectID));
+		WaitActivityState.ProgressAt = `STRATEGYRULES.GameTime;
+		`XCOMGAME.GameRuleset.SubmitGameState(NewGameState);
+	}
 
 	`LOG("ActivityState.GetMyTemplateName(): " $ActivityState.GetMyTemplateName(), class'X2EventListener_ChosenChain'.default.bLog, 'SOChosenChain');
 	`LOG("ObjectiveState.GetMyTemplateName(): " $ObjectiveState.GetMyTemplateName(), class'X2EventListener_ChosenChain'.default.bLog, 'SOChosenChain');
